@@ -1,0 +1,61 @@
+{
+  "name": "quotation-maping-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Quotation Maping Web — Desktop App",
+  "main": "electron/main.cjs",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "vite build && electron-builder --win",
+    "electron:preview": "electron ."
+  },
+  "build": {
+    "appId": "com.mapingweb.quotation",
+    "productName": "Quotation Maping Web",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "public/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "public/favicon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Quotation Maping Web"
+    }
+  },
+  "dependencies": {
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.14.0",
+    "jspdf": "^4.2.0",
+    "lucide-vue-next": "^0.475.0",
+    "pinia": "^2.3.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.0",
+    "autoprefixer": "^10.4.0",
+    "concurrently": "^9.1.0",
+    "electron": "^35.0.0",
+    "electron-builder": "^26.8.1",
+    "electron-squirrel-startup": "^1.0.1",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "vite": "^6.2.0",
+    "wait-on": "^8.0.0"
+  }
+}
