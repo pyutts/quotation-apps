@@ -102,14 +102,14 @@ html {
     content: '';
     flex: 1;
     height: 2px;
-    background: repeating-linear-gradient(90deg, rgba(99,102,241,0.3) 0px, rgba(99,102,241,0.3) 6px, transparent 6px, transparent 12px);
+    background: repeating-linear-gradient(90deg, rgba(22,92,107,0.3) 0px, rgba(22,92,107,0.3) 6px, transparent 6px, transparent 12px);
 }
 .page-break-indicator span {
     font-size: 11px;
     font-weight: 700;
-    color: #6366f1;
-    background: #eef2ff;
-    border: 1px solid #c7d2fe;
+    color: #165c6b;
+    background: #e6f2f5;
+    border: 1px solid #cce5eb;
     padding: 2px 12px;
     border-radius: 9999px;
     white-space: nowrap;

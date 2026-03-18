@@ -1,5 +1,6 @@
 <template>
-  <aside class="w-[450px] shrink-0 glass-panel border-r border-gray-200 overflow-y-auto no-scrollbar flex flex-col z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+  <aside
+    class="w-[450px] shrink-0 glass-panel border-r border-gray-200 overflow-y-auto no-scrollbar flex flex-col z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
     <div class="p-8 space-y-10">
 
       <!-- Section: Company -->
@@ -12,31 +13,9 @@
         </div>
 
         <div class="fade-in" style="animation-delay: 0.1s">
-          <label class="label-text">Company Logo</label>
-          <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:bg-white hover:border-primary-400 transition-all relative cursor-pointer group">
-            <input type="file" @change="handleLogoUpload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="image/*">
-            <div v-if="!store.logoSrc" class="flex flex-col items-center gap-2 text-gray-500 group-hover:text-primary-600 transition-colors">
-              <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-primary-50 group-hover:scale-110 transition-all duration-300">
-                <Upload class="w-6 h-6" />
-              </div>
-              <span class="text-sm font-medium">Click to upload logo</span>
-              <span class="text-xs text-gray-400">PNG, JPG up to 2MB</span>
-            </div>
-            <div v-else class="flex flex-col items-center gap-2">
-              <img :src="store.logoSrc" class="max-h-16 object-contain">
-              <span class="text-xs text-gray-400">Click to change</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="fade-in" style="animation-delay: 0.15s">
-          <label class="label-text">Company Name</label>
-          <input v-model="store.companyName" class="input-field" placeholder="e.g. Acme Studio">
-        </div>
-
-        <div class="fade-in" style="animation-delay: 0.2s">
           <label class="label-text">Company Address</label>
-          <textarea v-model="store.companyAddress" class="input-field resize-none h-24" placeholder="Your full business address"></textarea>
+          <textarea v-model="store.companyAddress" class="input-field resize-none h-24"
+            placeholder="Your full business address"></textarea>
         </div>
       </div>
 
@@ -58,7 +37,8 @@
 
         <div class="fade-in" style="animation-delay: 0.3s">
           <label class="label-text">Client Address</label>
-          <textarea v-model="store.clientAddress" class="input-field resize-none h-24" placeholder="Client's billing address"></textarea>
+          <textarea v-model="store.clientAddress" class="input-field resize-none h-24"
+            placeholder="Client's billing address"></textarea>
         </div>
       </div>
 
@@ -76,7 +56,13 @@
         <div class="grid grid-cols-2 gap-4 fade-in" style="animation-delay: 0.35s">
           <div>
             <label class="label-text">Quote No.</label>
-            <input v-model="store.quoteNumber" class="input-field" placeholder="e.g. QT-2023-001">
+            <div class="flex gap-2">
+              <input v-model="store.quoteNumber" class="input-field flex-1" placeholder="e.g. MW-2026-A1B2">
+              <button @click="store.generateQuoteNumber()" title="Generate Quote Number"
+                class="shrink-0 w-11 h-11 rounded-xl bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white flex items-center justify-center transition-all active:scale-95 border border-primary-200 hover:border-primary-600">
+                <RefreshCw class="w-4 h-4" />
+              </button>
+            </div>
           </div>
           <div>
             <label class="label-text">Date</label>
@@ -105,19 +91,15 @@
             <h2 class="font-bold text-gray-900 text-lg">Items & Details</h2>
           </div>
           <button @click="store.addItem()"
-                  class="text-sm font-semibold text-primary-600 hover:text-white hover:bg-primary-600 bg-primary-50 px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm active:scale-95">
+            class="text-sm font-semibold text-primary-600 hover:text-white hover:bg-primary-600 bg-primary-50 px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 shadow-sm active:scale-95">
             <Plus class="w-4 h-4" />
             Add Item
           </button>
         </div>
 
         <div class="space-y-4">
-          <ItemCard v-for="(item, index) in store.items"
-                    :key="item.id"
-                    :item="item"
-                    :index="index"
-                    :can-remove="store.items.length > 1"
-                    @remove="store.removeItem" />
+          <ItemCard v-for="(item, index) in store.items" :key="item.id" :item="item" :index="index"
+            :can-remove="store.items.length > 1" @remove="store.removeItem" />
         </div>
       </div>
 
@@ -126,19 +108,9 @@
 </template>
 
 <script setup>
-import { Building2, User, Info, ListChecks, Plus, Upload, Percent } from 'lucide-vue-next'
+import { Building2, User, Info, ListChecks, Plus, Percent, RefreshCw } from 'lucide-vue-next'
 import { useQuotationStore } from '../stores/quotation'
 import ItemCard from './ItemCard.vue'
 
 const store = useQuotationStore()
-
-function handleLogoUpload(event) {
-  const file = event.target.files[0]
-  if (!file) return
-  const reader = new FileReader()
-  reader.onload = () => {
-    store.setLogo(reader.result)
-  }
-  reader.readAsDataURL(file)
-}
 </script>

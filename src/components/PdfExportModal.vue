@@ -13,7 +13,7 @@
       <!-- Modal -->
       <div class="relative bg-white rounded-2xl shadow-2xl w-[440px] overflow-hidden fade-in">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-primary-600 to-indigo-600 px-6 py-5 text-white">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-5 text-white">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <FileDown class="w-5 h-5" />
@@ -42,9 +42,9 @@
           </div>
 
           <!-- Save method info -->
-          <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex items-start gap-3">
-            <Info class="w-5 h-5 text-indigo-500 mt-0.5 shrink-0" />
-            <p class="text-sm text-indigo-700 leading-relaxed">
+          <div class="bg-primary-50 border border-primary-100 rounded-xl p-4 flex items-start gap-3">
+            <Info class="w-5 h-5 text-primary-500 mt-0.5 shrink-0" />
+            <p class="text-sm text-primary-700 leading-relaxed">
               Click <strong>"Generate & Save As"</strong> to choose where to save the file on your device.
             </p>
           </div>
@@ -58,7 +58,7 @@
           </button>
           <button @click="generate"
                   :disabled="!filename.trim() || generating"
-                  class="flex-1 py-3 bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                  class="flex-1 py-3 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-primary-500/30 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
             <Loader2 v-if="generating" class="w-4 h-4 animate-spin" />
             <Download v-else class="w-4 h-4" />
             {{ generating ? 'Generating...' : 'Generate & Save As' }}

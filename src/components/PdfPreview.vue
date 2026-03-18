@@ -1,5 +1,6 @@
 <template>
-  <main class="flex-1 bg-gray-100/50 overflow-y-auto p-10 flex justify-center no-scrollbar relative" id="previewContainer">
+  <main class="flex-1 bg-gray-100/50 overflow-y-auto p-10 flex justify-center no-scrollbar relative"
+    id="previewContainer">
 
     <div id="pdf-wrapper">
       <template v-for="(page, pageIndex) in pages" :key="pageIndex">
@@ -11,7 +12,9 @@
         <!-- The page itself -->
         <div class="pdf-page rounded-sm">
           <!-- Decorative top bar on first page -->
-          <div v-if="pageIndex === 0" class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-primary-600 to-indigo-600 rounded-t-sm"></div>
+          <div v-if="pageIndex === 0"
+            class="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-primary-600 to-primary-500 rounded-t-sm">
+          </div>
           <div class="pdf-page-inner" v-html="page"></div>
         </div>
       </template>
