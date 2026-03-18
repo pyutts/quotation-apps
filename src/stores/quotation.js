@@ -39,6 +39,50 @@ const TRANSLATIONS = {
   },
 }
 
+// ── Markdown Parser ──
+function parseMarkdown(text) {
+  if (!text) return ''
+  
+  // Escape HTML first
+  let html = text.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  
+  // Bold: **text** (non-greedy match)
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#111827;font-weight:700;">$1</strong>')
+  
+  const lines = html.split('\n')
+  let result = ''
+  let inList = false
+  
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i].trimEnd()
+    const isBullet = line.trimStart().match(/^[-*]\s+/)
+    
+    if (isBullet) {
+      if (!inList) {
+        result += '<ul style="margin:4px 0 4px 16px;padding:0;list-style-type:disc;">\n'
+        inList = true
+      }
+      const itemText = line.trimStart().replace(/^[-*]\s+/, '')
+      result += `<li style="margin-bottom:3px;padding-left:4px;">${itemText}</li>\n`
+    } else if (line === '') {
+      if (inList) {
+        result += '</ul>\n'
+        inList = false
+      }
+      result += '<div style="height:6px;"></div>\n'
+    } else {
+      if (inList) {
+        result += '</ul>\n'
+        inList = false
+      }
+      result += `${line}<br>\n`
+    }
+  }
+  
+  if (inList) result += '</ul>\n'
+  return result
+}
+
 export const useQuotationStore = defineStore('quotation', () => {
   // ── State ──
   const companyName = ref('')
@@ -68,7 +112,7 @@ export const useQuotationStore = defineStore('quotation', () => {
   // Toast state
   const toast = ref({ show: false, msg: '', isError: false })
 
-  // ── Computed ──
+  // Computed
   const currencySymbol = computed(() => getCurrencySymbol(currency.value))
 
   const subtotal = computed(() =>
@@ -99,7 +143,7 @@ export const useQuotationStore = defineStore('quotation', () => {
     const itemRows = items.value
       .map((item, i) => {
         const descHtml = item.desc
-          ? `<p style="white-space:pre-line;color:#6b7280;font-size:13px;line-height:1.6;margin-top:6px;opacity:0.9">${item.desc}</p>`
+          ? `<div style="color:#6b7280;font-size:13px;line-height:1.6;margin-top:6px;opacity:0.9">${parseMarkdown(item.desc)}</div>`
           : ''
         return `
           <tr class="avoid-break" style="background:${i % 2 !== 0 ? 'rgba(249,250,251,0.5)' : 'transparent'}">

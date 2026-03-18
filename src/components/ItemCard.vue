@@ -22,11 +22,32 @@
           placeholder="e.g. Website Landing Page">
       </div>
       <div>
-        <label class="text-[11px] uppercase tracking-wider text-gray-400 font-bold mb-1 block">Description &
-          Details</label>
-        <textarea v-model="item.desc" rows="3"
-          class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none placeholder-gray-300 transition-colors bg-gray-50/50 focus:bg-white resize-none text-gray-600 leading-relaxed"
-          placeholder="List item features, what is included, etc..."></textarea>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-[11px] uppercase tracking-wider text-gray-400 font-bold block">Description &
+            Details</label>
+          <div class="flex items-center gap-1">
+            <button @click.prevent="execAction('undo')" title="Undo (Ctrl+Z)"
+              class="p-1.5 rounded-md text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors active:scale-95">
+              <Undo class="w-3.5 h-3.5" stroke-width="2.5" />
+            </button>
+            <button @click.prevent="execAction('redo')" title="Redo (Ctrl+Y)"
+              class="p-1.5 rounded-md text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors active:scale-95">
+              <Redo class="w-3.5 h-3.5" stroke-width="2.5" />
+            </button>
+            <div class="w-px h-3.5 bg-gray-200 mx-0.5"></div>
+            <button @click.prevent="insertFormat('bold')" title="Bold (Ctrl+B)"
+              class="p-1.5 rounded-md text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors active:scale-95">
+              <Bold class="w-3.5 h-3.5" stroke-width="3" />
+            </button>
+            <button @click.prevent="insertFormat('list')" title="Bullet List"
+              class="p-1.5 rounded-md text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors active:scale-95">
+              <List class="w-3.5 h-3.5" stroke-width="2.5" />
+            </button>
+          </div>
+        </div>
+        <textarea ref="textareaRef" v-model="item.desc" rows="3"
+          class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none placeholder-gray-400 transition-colors bg-gray-50/50 focus:bg-white resize-none text-gray-600 leading-relaxed"
+          placeholder="Tip: Use **bold** and start lines with '-' for bullet lists..."></textarea>
       </div>
       <div class="grid grid-cols-2 gap-4 pt-2">
         <div>
@@ -46,9 +67,9 @@
 </template>
 
 <script setup>
-import { Trash2 } from 'lucide-vue-next'
+import { Trash2, Bold, List, Undo, Redo } from 'lucide-vue-next'
 import { useQuotationStore } from '../stores/quotation'
-import { computed } from 'vue'
+import { computed, ref, nextTick } from 'vue'
 
 const store = useQuotationStore()
 
@@ -61,4 +82,48 @@ const props = defineProps({
 defineEmits(['remove'])
 
 const currencySymbol = computed(() => store.currencySymbol)
+
+const textareaRef = ref(null)
+
+const execAction = (action) => {
+  const textarea = textareaRef.value
+  if (!textarea) return
+  textarea.focus()
+  document.execCommand(action, false, null)
+}
+
+const insertFormat = (type) => {
+  const textarea = textareaRef.value
+  if (!textarea) return
+
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const text = textarea.value || ''
+
+  textarea.focus()
+
+  if (type === 'bold') {
+    const selected = text.substring(start, end)
+    textarea.setSelectionRange(start, end)
+    // Using execCommand preserves the native undo stack
+    document.execCommand('insertText', false, `**${selected}**`)
+    
+    // Adjust cursor to be inside the bold tags if nothing was selected
+    if (start === end) {
+      const newPos = start + 2
+      textarea.setSelectionRange(newPos, newPos)
+    }
+  } else if (type === 'list') {
+    const lastNewline = text.lastIndexOf('\n', start - 1)
+    const lineStart = lastNewline === -1 ? 0 : lastNewline + 1
+    
+    textarea.setSelectionRange(lineStart, lineStart)
+    document.execCommand('insertText', false, '- ')
+    
+    // Restore selection to where it was (shifted by 2 characters)
+    const newStart = start + 2
+    const newEnd = end + 2
+    textarea.setSelectionRange(newStart, newEnd)
+  }
+}
 </script>
