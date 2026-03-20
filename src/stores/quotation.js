@@ -93,11 +93,14 @@ export const useQuotationStore = defineStore('quotation', () => {
   const quoteNumber = ref('')
   const quoteDate = ref('')
   const taxRate = ref(10)
+  const enableTax = ref(true)
   const currency = ref('USD')
   const language = ref('en')
   const showSignature = ref(true)
   const pdfGenerating = ref(false)
   const showExportModal = ref(false)
+  const showShortcutsModal = ref(false)
+  const zoomLevel = ref(1.0)
   const nextId = ref(2)
   const items = ref([
     {
@@ -119,7 +122,7 @@ export const useQuotationStore = defineStore('quotation', () => {
     items.value.reduce((sum, item) => sum + ((item.qty || 0) * (item.price || 0)), 0)
   )
 
-  const tax = computed(() => subtotal.value * ((taxRate.value || 0) / 100))
+  const tax = computed(() => enableTax.value ? subtotal.value * ((taxRate.value || 0) / 100) : 0)
 
   const total = computed(() => subtotal.value + tax.value)
 
@@ -137,7 +140,8 @@ export const useQuotationStore = defineStore('quotation', () => {
     const clAddr = (clientAddress.value || 'Client Address').replace(/\n/g, '<br>')
     const qNum = quoteNumber.value || '#0001'
 
-    const imgSrc = logoSrc.value || '/logo.png'
+    const isElectron = !!window.electronAPI?.isElectron
+    const imgSrc = logoSrc.value || (isElectron ? './logo.png' : '/logo.png')
     const logoHtml = `<img src="${imgSrc}" class="object-contain" style="max-height:48px;margin-bottom:20px;">`
 
     const itemRows = items.value
@@ -219,10 +223,12 @@ export const useQuotationStore = defineStore('quotation', () => {
             <span style="color:#6b7280;font-weight:500;font-size:15px">${t.subtotal}</span>
             <span style="font-weight:600;color:#111827;font-size:15px">${sym} ${formattedMoney(subtotal.value)}</span>
           </div>
+          ${enableTax.value ? `
           <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f3f4f6">
             <span style="color:#6b7280;font-weight:500;font-size:15px">${t.tax} (${taxRate.value || 0}%)</span>
             <span style="font-weight:600;color:#111827;font-size:15px">${sym} ${formattedMoney(tax.value)}</span>
           </div>
+          ` : ''}
           <div style="display:flex;justify-content:space-between;padding:20px;margin-top:16px;background:#f9fafb;border-radius:16px;border:1px solid #f3f4f6">
             <span style="font-weight:700;font-size:20px;color:#111827">${t.total}</span>
             <span style="font-weight:700;font-size:20px;color:#165c6b">${sym} ${formattedMoney(total.value)}</span>
@@ -277,6 +283,18 @@ export const useQuotationStore = defineStore('quotation', () => {
     logoSrc.value = base64
   }
 
+  function zoomIn() {
+    zoomLevel.value = Math.min(zoomLevel.value + 0.1, 2.0)
+  }
+
+  function zoomOut() {
+    zoomLevel.value = Math.max(zoomLevel.value - 0.1, 0.5)
+  }
+
+  function resetZoom() {
+    zoomLevel.value = 1.0
+  }
+
   function showToast(msg, isError = false) {
     toast.value = { show: true, msg, isError }
     setTimeout(() => {
@@ -295,6 +313,7 @@ export const useQuotationStore = defineStore('quotation', () => {
         quoteNumber: quoteNumber.value,
         quoteDate: quoteDate.value,
         taxRate: taxRate.value,
+        enableTax: enableTax.value,
         currency: currency.value,
         language: language.value,
         showSignature: showSignature.value,
@@ -322,6 +341,7 @@ export const useQuotationStore = defineStore('quotation', () => {
       if (s.quoteNumber !== undefined) quoteNumber.value = s.quoteNumber
       if (s.quoteDate !== undefined) quoteDate.value = s.quoteDate
       if (s.taxRate !== undefined) taxRate.value = s.taxRate
+      if (s.enableTax !== undefined) enableTax.value = s.enableTax
       if (s.currency !== undefined) currency.value = s.currency
       if (s.language !== undefined) language.value = s.language
       if (s.showSignature !== undefined) showSignature.value = s.showSignature
@@ -349,11 +369,14 @@ export const useQuotationStore = defineStore('quotation', () => {
     quoteNumber,
     quoteDate,
     taxRate,
+    enableTax,
     currency,
     language,
     showSignature,
     pdfGenerating,
     showExportModal,
+    showShortcutsModal,
+    zoomLevel,
     items,
     toast,
     // Computed
@@ -369,6 +392,9 @@ export const useQuotationStore = defineStore('quotation', () => {
     addItem,
     removeItem,
     setLogo,
+    zoomIn,
+    zoomOut,
+    resetZoom,
     showToast,
     exportToJson,
     importFromJson,

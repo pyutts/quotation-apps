@@ -70,11 +70,21 @@
           </div>
         </div>
 
-        <div class="fade-in" style="animation-delay: 0.4s">
-          <label class="label-text">Tax Rate (%)</label>
-          <div class="relative">
-            <input v-model.number="store.taxRate" type="number" min="0" step="0.1" class="input-field pl-10">
-            <Percent class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div class="fade-in space-y-3" style="animation-delay: 0.4s">
+          <label class="flex items-center gap-3 cursor-pointer group">
+            <div class="relative flex items-center">
+              <input type="checkbox" v-model="store.enableTax" class="sr-only peer">
+              <div class="w-10 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500"></div>
+            </div>
+            <span class="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">Apply Tax</span>
+          </label>
+          
+          <div v-if="store.enableTax" class="relative mt-2">
+            <label class="label-text mb-1">Tax Rate (%)</label>
+            <div class="relative">
+              <input v-model.number="store.taxRate" type="number" min="0" step="0.1" class="input-field pl-10">
+              <Percent class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            </div>
           </div>
         </div>
       </div>

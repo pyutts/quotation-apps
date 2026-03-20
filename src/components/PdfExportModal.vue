@@ -8,59 +8,64 @@
     leave-to-class="opacity-0">
     <div v-if="store.showExportModal" class="fixed inset-0 z-50 flex items-center justify-center">
       <!-- Backdrop -->
-      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" @click="close"></div>
+      <div class="absolute inset-0 bg-gray-900/50" @click="close"></div>
 
       <!-- Modal -->
-      <div class="relative bg-white rounded-2xl shadow-2xl w-[440px] overflow-hidden fade-in">
+      <div class="relative bg-white rounded-3xl shadow-2xl w-[480px] overflow-hidden fade-in flex flex-col">
         <!-- Header -->
-        <div class="bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-5 text-white">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-              <FileDown class="w-5 h-5" />
+        <div class="px-8 pt-8 pb-6 border-b border-gray-100 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center">
+              <FileDown class="w-6 h-6" />
             </div>
             <div>
-              <h3 class="font-bold text-lg">Export PDF</h3>
-              <p class="text-white/70 text-sm">Choose filename and save location</p>
+              <h3 class="font-extrabold text-xl text-gray-900 tracking-tight">Export PDF</h3>
+              <p class="text-gray-500 text-sm font-medium mt-0.5">Choose filename and save location</p>
             </div>
           </div>
+          <button @click="close" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors focus:outline-none">
+            <X class="w-5 h-5" />
+          </button>
         </div>
 
         <!-- Body -->
-        <div class="p-6 space-y-5">
+        <div class="p-8 space-y-6">
           <!-- Filename -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Filename</label>
-            <div class="relative">
+            <label class="block text-sm font-bold text-gray-900 mb-2">Filename</label>
+            <div class="relative group">
               <input
                 ref="filenameInput"
                 v-model="filename"
                 @keydown.enter="generate"
-                class="w-full border border-gray-200 rounded-xl px-4 py-3 pr-14 bg-gray-50/50 focus:bg-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all outline-none text-sm font-medium"
+                class="w-full border border-gray-200 rounded-xl px-4 py-3.5 pr-14 bg-white focus:bg-white focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none text-sm font-semibold text-gray-800"
                 placeholder="Enter filename">
-              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">.pdf</span>
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">.pdf</span>
             </div>
           </div>
 
           <!-- Save method info -->
-          <div class="bg-primary-50 border border-primary-100 rounded-xl p-4 flex items-start gap-3">
-            <Info class="w-5 h-5 text-primary-500 mt-0.5 shrink-0" />
-            <p class="text-sm text-primary-700 leading-relaxed">
-              Click <strong>"Generate & Save As"</strong> to choose where to save the file on your device.
+          <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 flex items-start gap-3.5">
+            <div class="p-1 rounded-full bg-blue-100 shrink-0">
+              <Info class="w-4 h-4 text-blue-600" />
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed font-medium">
+              Click <span class="text-gray-900 font-bold">Generate & Save As</span> to choose where to save the file on your device.
             </p>
           </div>
         </div>
 
         <!-- Footer -->
-        <div class="px-6 pb-6 flex gap-3">
+        <div class="px-8 pb-8 flex gap-3">
           <button @click="close"
-                  class="flex-1 py-3 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-all active:scale-[0.98]">
+                  class="flex-1 py-3.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl text-sm font-bold transition-all active:scale-[0.98]">
             Cancel
           </button>
           <button @click="generate"
                   :disabled="!filename.trim() || generating"
-                  class="flex-1 py-3 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-xl text-sm font-semibold shadow-lg shadow-primary-500/30 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-            <Loader2 v-if="generating" class="w-4 h-4 animate-spin" />
-            <Download v-else class="w-4 h-4" />
+                  class="flex-1 py-3.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-primary-600/20 transition-all hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <Loader2 v-if="generating" class="w-5 h-5 animate-spin" />
+            <Download v-else class="w-5 h-5" />
             {{ generating ? 'Generating...' : 'Generate & Save As' }}
           </button>
         </div>
@@ -71,7 +76,7 @@
 
 <script setup>
 import { ref, watch, nextTick } from 'vue'
-import { FileDown, Download, Info, Loader2 } from 'lucide-vue-next'
+import { FileDown, Download, Info, Loader2, X } from 'lucide-vue-next'
 import { useQuotationStore } from '../stores/quotation'
 import { generatePDFBlob } from '../utils/pdfGenerator'
 

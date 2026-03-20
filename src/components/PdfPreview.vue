@@ -1,8 +1,8 @@
 <template>
   <main class="flex-1 bg-gray-100/50 overflow-y-auto p-10 flex justify-center no-scrollbar relative"
-    id="previewContainer">
+    id="previewContainer" @wheel="handleWheel">
 
-    <div id="pdf-wrapper">
+    <div id="pdf-wrapper" :style="{ transform: `scale(${store.zoomLevel})`, transformOrigin: 'top center', transition: 'transform 0.2s ease-out' }">
       <template v-for="(page, pageIndex) in pages" :key="pageIndex">
         <!-- Page break indicator between pages -->
         <div v-if="pageIndex > 0" class="page-break-indicator">
@@ -25,17 +25,42 @@
       <div v-html="store.fullContentHtml"></div>
     </div>
 
+    <!-- Zoom Controls -->
+    <div class="fixed bottom-6 right-8 flex items-center bg-white shadow-xl rounded-full border border-gray-200 overflow-hidden z-20">
+      <button @click="store.zoomOut()" class="p-2.5 hover:bg-gray-50 text-gray-600 transition-colors" title="Zoom Out (Ctrl -)">
+        <Minus class="w-4 h-4" />
+      </button>
+      <div class="px-2 text-sm font-semibold text-gray-700 select-none min-w-[3.5rem] text-center cursor-pointer hover:bg-gray-50 py-2.5" @click="store.resetZoom()" title="Reset Zoom (Ctrl 0)">
+        {{ Math.round(store.zoomLevel * 100) }}%
+      </div>
+      <button @click="store.zoomIn()" class="p-2.5 hover:bg-gray-50 text-gray-600 transition-colors" title="Zoom In (Ctrl +)">
+        <Plus class="w-4 h-4" />
+      </button>
+    </div>
+
   </main>
 </template>
 
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue'
+import { Plus, Minus } from 'lucide-vue-next'
 import { useQuotationStore } from '../stores/quotation'
 
 const store = useQuotationStore()
 const renderArea = ref(null)
 const pages = ref([''])
 let rafId = null
+
+function handleWheel(e) {
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault()
+    if (e.deltaY < 0) {
+      store.zoomIn()
+    } else {
+      store.zoomOut()
+    }
+  }
+}
 
 function calculatePages() {
   const area = renderArea.value

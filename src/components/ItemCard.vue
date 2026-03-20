@@ -46,6 +46,14 @@
           </div>
         </div>
         <textarea ref="textareaRef" v-model="item.desc" rows="3"
+          @keydown.ctrl.b.prevent="insertFormat('bold')"
+          @keydown.meta.b.prevent="insertFormat('bold')"
+          @keydown.ctrl.l.prevent="insertFormat('list')"
+          @keydown.meta.l.prevent="insertFormat('list')"
+          @keydown.ctrl.z.prevent="execAction('undo')"
+          @keydown.meta.z.prevent="execAction('undo')"
+          @keydown.ctrl.y.prevent="execAction('redo')"
+          @keydown.meta.y.prevent="execAction('redo')"
           class="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none placeholder-gray-400 transition-colors bg-gray-50/50 focus:bg-white resize-none text-gray-600 leading-relaxed"
           placeholder="Tip: Use **bold** and start lines with '-' for bullet lists..."></textarea>
       </div>
@@ -69,7 +77,7 @@
 <script setup>
 import { Trash2, Bold, List, Undo, Redo } from 'lucide-vue-next'
 import { useQuotationStore } from '../stores/quotation'
-import { computed, ref, nextTick } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const store = useQuotationStore()
 
@@ -85,11 +93,41 @@ const currencySymbol = computed(() => store.currencySymbol)
 
 const textareaRef = ref(null)
 
+// Custom History Stack to fix Vue reactivity overwriting native Undo/Redo
+const history = ref([props.item.desc || ''])
+const historyIndex = ref(0)
+let isUndoRedo = false
+
+watch(() => props.item.desc, (newVal) => {
+  if (isUndoRedo) {
+    isUndoRedo = false
+    return
+  }
+  const val = newVal || ''
+  if (val !== history.value[historyIndex.value]) {
+    history.value = history.value.slice(0, historyIndex.value + 1)
+    history.value.push(val)
+    if (history.value.length > 50) history.value.shift() // Limit history size
+    else historyIndex.value++
+  }
+})
+
 const execAction = (action) => {
-  const textarea = textareaRef.value
-  if (!textarea) return
-  textarea.focus()
-  document.execCommand(action, false, null)
+  if (action === 'undo' && historyIndex.value > 0) {
+    historyIndex.value--
+    isUndoRedo = true
+    props.item.desc = history.value[historyIndex.value]
+  } else if (action === 'redo' && historyIndex.value < history.value.length - 1) {
+    historyIndex.value++
+    isUndoRedo = true
+    props.item.desc = history.value[historyIndex.value]
+  } else {
+    // Fallback for native execution context
+    const textarea = textareaRef.value
+    if (!textarea) return
+    textarea.focus()
+    document.execCommand(action, false, null)
+  }
 }
 
 const insertFormat = (type) => {
